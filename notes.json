@@ -1,0 +1,194 @@
+{
+  "name": "Test: meeting note summariser",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "={{ $json.id }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        -260,
+        -280
+      ],
+      "id": "9a185b5f-9556-42ec-83ca-6ddf2a083d80",
+      "name": "Google Docs",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "3dk3iAQGLKRzGYnz",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "aftab.mahmud@qantas.com.au",
+        "subject": "={{ $('Google Drive Trigger').item.json.name }}",
+        "message": "={{ $json.output }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        260,
+        -280
+      ],
+      "id": "baee3a29-d0c8-414c-b3a2-72b47d24cd82",
+      "name": "Gmail",
+      "webhookId": "0ddaddab-5aaf-4e6f-8771-20f3f7f33363",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "m6lg39f10QCQTWLI",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=here is the transcript: {{ $json.content }}\n\nMeeting Date: {{ $('Google Drive Trigger').item.json.createdTime }}\n",
+        "options": {
+          "systemMessage": "You are an expert meeting note-taker. When analyzing meeting transcripts, create detailed and comprehensive notes that capture the full depth of discussions while maintaining clarity and structure. You appropriately formatted the output in HTML and Australian English.\n\nFORMAT REQUIREMENTS\n------------------\n1. MEETING HEADER\n   • Full meeting title and context\n   • Date, time, duration, location\n   • Complete attendee list with roles\n   • Clear meeting objectives\n\n2. DISCUSSION TOPICS\n   For each topic discussed:\n   a) Clear topic heading\n   b) Comprehensive overview paragraph capturing context and importance in detailed\n   c) Detailed discussion points including:\n      - All key information shared\n      - Questions raised and answers provided\n      - Technical details and numbers mentioned\n      - Process explanations\n      - Current practices\n      - Challenges or concerns raised\n   d) Any decisions or conclusions\n   e) Related action items\n3. Key Control/PROCESS\n   Thoroughly document the key controls:\n   • All identified Key process\n   • Process owner\n   • Frequency of the control/process\n   • System utilised or Manual or mixed\n\n4. PROCESS & CONTROL GAPS\n   Thoroughly document and provide the comprehensive control statement\n   • All identified process weaknesses\n   • Control gaps mentioned\n   • Documentation issues\n   • System limitations\n   • Compliance concerns\n   • Risk areas\n   • Current workarounds\n   Include context and potential impacts for each gap\n\n5. DOCUMENT REQUESTS\n   Create detailed tracking of:\n   • All documents mentioned or requested\n   • Specific content requirements\n   • Responsible parties\n   • Purpose of each document\n   • Timeline if specified\n   • Format requirements\n   • Access or permission considerations\n\n6. NEXT STEPS\n   Document all follow-up actions including:\n   • Specific tasks\n   • Responsible parties\n   • Dependencies\n   • Deadlines\n   • Expected outcomes\n\nFORMATTING GUIDELINES\n--------------------\n- Use clear hierarchical structure\n- Include section numbering\n- Use bullet points for lists\n- Use indentation for sub-points\n- Maintain consistent formatting\n- Use headers and sub-headers for easy navigation\n- Include page numbers for longer documents\n\nThe output should be:\n1. Comprehensive enough that someone not in the meeting can understand the full context, including the question responses\n2. Well-organized for easy reference\n3. Professional in appearance and language\n4. Suitable for sharing with stakeholders\n5. Clear about next steps and responsibilities\n6. Start with the meeting note instate \"here is a comprehensive summary of the meeting notes in HTML format:\\n\\n.\"\n\nImportant Note: Don't include a Tag similar to this \"``html\\n<!DOCTYPE html>\\n\" as this will be shared in an email."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -80,
+        -280
+      ],
+      "id": "05aa22ee-3650-4536-9bcd-1b6e79bc409e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.2,
+      "position": [
+        -80,
+        -80
+      ],
+      "id": "67b38029-a2f8-4717-accc-6939af48e6d9",
+      "name": "Anthropic Chat Model",
+      "credentials": {
+        "anthropicApi": {
+          "id": "powbFPeixkXq5fuB",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Meeting Note Summariser - No Manual Input required\n",
+        "height": 460,
+        "width": 1060
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -520,
+        -340
+      ],
+      "typeVersion": 1,
+      "id": "4302b539-2c5e-415d-a7d0-3aedfd9eea96",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1Yv4L0znC7geWDLR4yVj_zDquGBdK9DUo",
+          "mode": "list",
+          "cachedResultName": "Tactiq Meeting Trascripts ",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1Yv4L0znC7geWDLR4yVj_zDquGBdK9DUo"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -460,
+        -280
+      ],
+      "id": "44363a33-6021-4a7f-9774-e40c4959cb7b",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "6mS1g0lr4ZZKdgm0",
+          "name": "Google Drive - aftabdx"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Docs": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Docs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "47ff8ddd-1e0d-42ff-9a17-a944366347b0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b20c1a22249a77e3587acdad476e33a7feb1a098de595996887840c1c60c39ba"
+  },
+  "id": "A1Rn0NrY9YY1Hjfi",
+  "tags": []
+}
